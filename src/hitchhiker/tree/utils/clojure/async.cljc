@@ -2,7 +2,7 @@
   (:require #?(:clj [hitchhiker.tree.utils.platform])
             [clojure.core.async :as async]))
 
-(def ^:dynamic *async?* false)
+(def ^:dynamic *async?* true)
 
 (defmacro if-async?
   ""
