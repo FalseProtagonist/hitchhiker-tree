@@ -5,7 +5,7 @@
         org.clojure/core.cache      {:mvn/version "1.0.207"}
         com.taoensso/carmine        {:mvn/version "2.20.0"}
         io.replikativ/konserve      {:git/url "https://github.com/replikativ/konserve.git"
-                                     :sha "f904359fc91fd6e6c36b9cd320d7beadaf5a15b7"}}
+                                     :sha "e70abe063adb6ed064e78daa7e00f4b03d6222a8"}}
  :aliases {:cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "2.10.21"}
                                binaryage/devtools   {:mvn/version "1.0.2"}}
                   :extra-paths ["test"]}
