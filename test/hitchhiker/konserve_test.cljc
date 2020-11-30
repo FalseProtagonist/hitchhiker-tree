@@ -32,9 +32,9 @@
      (ha/if-async?
       (do
         (when path
-          (msg/forward-iterator iter-ch path key))
+          (msg/forward-iterator iter-ch tree key))
         (ha/<? (async/into [] iter-ch)))
-      (msg/forward-iterator path key)))))
+      (msg/forward-iterator tree key)))))
 
 (deftest simple-konserve-test
   (testing "Insert and lookup"

@@ -185,16 +185,17 @@
    (defn forward-iterator
      "Takes the result of a search and puts the iterated elements onto iter-ch
   going forward over the tree as needed. Does lg(n) backtracking sometimes."
-     [iter-ch path start-key]
+     [iter-ch tree start-key]
      (ha/go-try
-      (loop [path path]
-        (if path
-          (let [elements (drop-while (fn [[k v]]
-                                       (neg? (c/-compare k start-key)))
-                                     (apply-ops-in-path path))]
-            (ha/<? (async/onto-chan! iter-ch elements false))
-            (recur (ha/<? (tree/right-successor (pop path)))))
-          (async/close! iter-ch)))))
+      (let [path (ha/<? (tree/lookup-path tree start-key))]
+        (loop [path path]
+          (if path
+            (let [elements (drop-while (fn [[k v]]
+                                         (neg? (c/-compare k start-key)))
+                                       (apply-ops-in-path path))]
+              (ha/<? (async/onto-chan! iter-ch elements false))
+              (recur (ha/<? (tree/right-successor (pop path)))))
+            (async/close! iter-ch))))))
 
    #?(:clj
       (defn lookup-fwd-iter
@@ -203,9 +204,8 @@
   disturbs async contexts and might lead to poor performance. It is mainly here
   to facilitate testing or for exploration on the REPL."
         [tree key]
-        (let [path (ha/<?? (tree/lookup-path tree key))
-              iter-ch (async/chan)]
-          (forward-iterator iter-ch path key)
+        (let [iter-ch (async/chan)]
+          (forward-iterator iter-ch tree key)
           (ha/chan-seq iter-ch)))))
  ;; else
  (do
