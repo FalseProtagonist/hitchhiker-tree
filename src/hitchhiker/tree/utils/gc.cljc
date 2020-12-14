@@ -1,5 +1,6 @@
 (ns hitchhiker.tree.utils.gc
-  (:require [hitchhiker.tree :as hh]
+  (:require #?(:clj [hitchhiker.tree :as hh]
+               :cljs [hitchhiker.tree-cljs :as hh])
             [hitchhiker.tree.node :as n]
             [hitchhiker.tree.bootstrap.konserve :as kons]
             [#?(:clj hitchhiker.tree.utils.clojure.async
