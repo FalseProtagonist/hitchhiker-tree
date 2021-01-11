@@ -4,7 +4,8 @@
    [konserve.cache :as k]
    [hasch.core :as h]
    [hitchhiker.tree.messaging :as msg]
-   #?(:clj [hitchhiker.tree :as tree]
+   [hitchhiker.tree :as tree]
+   #_#?(:clj [hitchhiker.tree :as tree]
       :cljs [hitchhiker.tree-cljs :as tree])
    [hitchhiker.tree.node :as n]
    [hitchhiker.tree.backend :as b]
@@ -121,12 +122,9 @@
   ;; TODO check whether store is using nippy in the future and load on the fly:
   #_[hitchhiker.tree.codec.nippy :as nippy]
   #_(nippy/ensure-installed!)
-  (let [tree-datanode #?(:clj 'hitchhiker.tree.DataNode
-                         :cljs 'hitchhiker.tree-cljs.DataNode)
-        tree-indexnode #?(:clj 'hitchhiker.tree.IndexNode
-                          :cljs 'hitchhiker.tree-cljs.IndexNode)
-        tree-config #?(:clj 'hitchhiker.tree.Config
-                       :cljs 'hitchhiker.tree-cljs.Config)]
+  (let [tree-datanode 'hitchhiker.tree.DataNode
+        tree-indexnode 'hitchhiker.tree.IndexNode
+        tree-config 'hitchhiker.tree.Config]
     (swap! (:read-handlers store)
            merge
            {'hitchhiker.tree.bootstrap.konserve.KonserveAddr

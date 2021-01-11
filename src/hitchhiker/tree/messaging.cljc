@@ -8,7 +8,9 @@
    [hitchhiker.tree.key-compare :as c]
    [clojure.core.rrb-vector :as rrb]
    [hasch.core :as h]
-   #?(:clj [hitchhiker.tree :as tree]
+   [hitchhiker.tree :as tree]
+   
+   #_#?(:clj [hitchhiker.tree :as tree]
       :cljs [hitchhiker.tree-cljs :as tree])
    [clojure.core.async :as async]))
 

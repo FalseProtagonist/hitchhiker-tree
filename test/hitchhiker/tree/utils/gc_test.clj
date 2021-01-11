@@ -14,7 +14,7 @@
    [konserve.filestore :refer [new-fs-store delete-store]]
    [clojure.core.async :as async]))
 
-(deftest hitchhiker-tree-gc-test
+#_(deftest hitchhiker-tree-gc-test
   (testing "Test the GC."
     (let [folder           "/tmp/hh-tree-gc"
           _                (delete-store folder)

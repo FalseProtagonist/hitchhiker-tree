@@ -12,9 +12,9 @@
             [konserve.cache :as kc]
             [konserve.core :as k]
             [hasch.core :as hasch]
-            #?(:clj [hitchhiker.tree :as core]
+            #_#?(:clj [hitchhiker.tree :as core]
                :cljs [hitchhiker.tree-cljs :as core])
-            ;[hitchhiker.tree :as core]
+            [hitchhiker.tree :as core]
             [#?(:clj hitchhiker.tree.utils.clojure.async
                 :cljs hitchhiker.tree.utils.cljs.async) :as ha]
             [hitchhiker.tree.messaging :as msg]

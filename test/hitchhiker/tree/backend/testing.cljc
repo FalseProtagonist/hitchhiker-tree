@@ -4,7 +4,8 @@
        :cljs hitchhiker.tree.utils.cljs.async) :as ha]
    [hitchhiker.tree.node :as n]
    [hitchhiker.tree.node.testing :as tn]
-   #?(:clj [hitchhiker.tree :as tree]
+   [hitchhiker.tree :as tree]
+   #_#?(:clj [hitchhiker.tree :as tree]
       :cljs [hitchhiker.tree-cljs :as tree])
    [hitchhiker.tree.backend :as b]))
 
