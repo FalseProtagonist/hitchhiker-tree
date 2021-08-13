@@ -87,7 +87,10 @@
              (-order-on-edn-types [_] 10000)
 
              object
-             (-order-on-edn-types [t] (throw-unsupported-type t))]))
+             (-order-on-edn-types [t] 
+                                  (println "unknown order-on-edn-types")
+                                  (println (.-stack (js/Error.)))
+                                  (throw-unsupported-type t))]))
 
 #?(:clj
    (defn compare-uuids

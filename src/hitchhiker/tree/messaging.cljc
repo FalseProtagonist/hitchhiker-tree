@@ -31,14 +31,28 @@
 
 (defn enqueue
   ([tree msgs]
-   (ha/go-try
-    (let [deferred-ops (atom [])]
-      (loop [tree (ha/<? (enqueue tree msgs deferred-ops))
-             [op & r] @deferred-ops]
-        (if op
-          (recur (ha/<? (op/-apply-op-to-tree op tree))
-                 r)
-          tree)))))
+   (do 
+    ;;  (println "in enqueue")
+      (ha/go-try
+        (let [deferred-ops (atom [])]
+          ;; (println "in let")
+          (loop [tree (ha/<? (enqueue tree msgs deferred-ops))
+                 [op & r] @deferred-ops]
+            (if op
+              (let [;; _ (println "in enqueue let block")
+                    op-res
+                    ;; (ha/<? (op/-apply-op-to-tree op tree))
+                    (async/<! (op/-apply-op-to-tree op tree))]
+                #?(:cljs (when (instance? js/Error op-res)
+                           (do
+                             (println "got error from op-to-tree")
+                             (println "op was " op)
+                             (println "my stacktrace" (.-stack (js/Error.)))
+                             (println (.-stack op-res))
+                             (throw op-res))))
+                (recur op-res
+                       r))
+              tree))))))
 
   ([tree msgs deferred-ops]
    (ha/go-try
@@ -53,13 +67,17 @@
             (n/-dirty!)
             (update-in [:op-buf] into msgs))
         :else ;; overflow, should be IndexNode
-        (do (assert (tree/index-node? tree))
+        (do 
+          (println "enqueue :else")
+          (assert (tree/index-node? tree))
             (loop [[child & children] (:children tree)
                    rebuilt-children (transient [])
                    msgs (vec (sort-by op/-affects-key ;must be a stable sort
                                       c/-compare
                                       (concat (:op-buf tree) msgs)))]
-              (let [took-msgs (into []
+              (let [
+
+                    took-msgs (into []
                                     (take-while #(>= 0 (c/-compare
                                                         (op/-affects-key %)
                                                         (n/-last-key child))))

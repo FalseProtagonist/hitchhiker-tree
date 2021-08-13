@@ -32,6 +32,7 @@
 
 (defn encode-data-node
   [node]
+  ;; (println "calling encode-data-node")
   (nilify node
           [:storage-addr
            :*last-key-cache]))
@@ -65,12 +66,18 @@
 
   (-resolve-chan [this]
     (ha/go-try
+    ;;  (println "resolving chan")
      (let [cache (:cache store)]
        (if-let [v (cache/lookup @cache konserve-key)]
          (do
+          ;;  (println "hit cache")
            (swap! cache cache/hit konserve-key)
            (assoc v :storage-addr (synthesize-storage-address konserve-key)))
          (let [ch (k/get-in store [konserve-key])]
+          ;;  (println "missed cache")
+          ;;  (println "konserve-key " konserve-key)
+          ;;  (println "synthesized-addr " (synthesize-storage-address konserve-key))
+          ;;  (println "konserve-key ch " ch)
            (assoc (ha/if-async?
                    (ha/<? ch)
                    (async/<!! ch))
@@ -85,15 +92,21 @@
 
 (defrecord KonserveBackend [store]
   b/IBackend
-  (-new-session [_] (atom {:writes 0 :deletes 0}))
+  (-new-session [_]
+                ;; (println "KonserveBackend new session")
+                (atom {:writes 0 :deletes 0}))
   (-anchor-root [_ {:keys [konserve-key] :as node}]
+    ;; (println "KonserveBackend -anchor-root")
     node)
   (-write-node [_ node session]
+    ;; (println "KonserveBackend Write Node")
     (ha/go-try
      (swap! session update-in [:writes] inc)
      (let [pnode (encode node)
            id (h/uuid pnode)]
+      ;;  (println "about to call assoc-in for store")
        (ha/<? (k/assoc-in store [id] node))
+      ;;  (println "called assoc-in for store")
        (konserve-addr store
                       (n/-last-key node)
                       id))))
@@ -119,6 +132,7 @@
                                             root-key))))))
 
 (defn add-hitchhiker-tree-handlers [store]
+  (println "adding hitchiker-tree-handlers")
   ;; TODO check whether store is using nippy in the future and load on the fly:
   #_[hitchhiker.tree.codec.nippy :as nippy]
   #_(nippy/ensure-installed!)
@@ -134,6 +148,7 @@
                              konserve-key))
             tree-datanode      
             (fn [{:keys [children cfg] :as d}]
+              ;; (println "calling tree-datanode handler")
               (tree/data-node (into (sorted-map-by c/-compare)
                                     children)
                               cfg))

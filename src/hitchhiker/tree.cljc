@@ -352,29 +352,66 @@
         :children
         (get key not-found)))))
 
+(def log-atom (atom 0))
+
+(def log-atom2 (atom []))
+
 (defn insert
   [{:keys [cfg] :as tree} k v]
+  ;; todo switch back
+
+  
   (ha/go-try
+  ;;  (println "in hitchhiker tree insert")
    (let [path (ha/<? (lookup-path tree k))
+         _ (reset! log-atom 2)
          {:keys [children] :or {children empty-sorted-map-by-compare}} (peek path)
-         updated-data-node (data-node (assoc children k v)
-                                      cfg)]
+         _ (reset! log-atom 3)
+         _ (swap! log-atom2 #(cons [children k v] %1))
+         assoced-kids #?(:cljs (try (assoc children k v)
+                                    (catch :default e
+                                      (println "failed for children " children)
+                                      (println "type " (type children))
+                                      (println "failed for key" k)
+                                      (println "type " (type k))
+                                      (println "failed for v" v)
+                                      (println " e " e)
+                                      (println " e trace " (.-stack e))
+                                      (throw e)))
+                         :clj (assoc children k v))
+         _ (reset! log-atom 31)
+         updated-data-node #?(:cljs (try (data-node assoced-kids
+                                                    cfg)
+                                         (catch :default e
+                                           (println "failed for kids " assoced-kids " cfg " cfg)
+                                           (throw e)))
+                              :clj (data-node assoced-kids
+                                              cfg))
+         _ (reset! log-atom 4)]
      (loop [node updated-data-node
             path (pop path)]
        (if (empty? path)
          (if (n/-overflow? node)
-           (let [{:keys [left right median]} (n/-split-node node)]
+           (let [
+                 _ (reset! log-atom 4)
+                 {:keys [left right median]} (n/-split-node node)]
+             (reset! log-atom 5)
              (index-node [left right]
                          []
                          cfg))
            node)
-         (let [index (peek path)
+         (let [
+               _ (reset! log-atom 6)
+               index (peek path)
+               _ (reset! log-atom 7)
                init-path (pop path)
+               _ (reset! log-atom 8)
                {:keys [children keys] :as parent} (peek init-path)]
            ;; splice the split into the parent
            (if (n/-overflow? node)
              ;; TODO refactor paths to be node/index pairs or 2 vectors or something
-             (let [{:keys [left right median]} (n/-split-node node)
+             (let [_ (reset! log-atom 9)
+                   {:keys [left right median]} (n/-split-node node)
                    new-children (catvec (conj (subvec children 0 index)
                                               left right)
                                         (subvec children (inc index)))]
